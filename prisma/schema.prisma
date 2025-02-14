@@ -1,0 +1,64 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        BigInt    @id @default(autoincrement())
+  firstName String    @map("first_name")
+  lastName  String    @map("last_name")
+  email     String    @unique
+  avatarUrl String    @map("avatar_url")
+  comments  Comment[]
+  posts     Post[]
+}
+
+model Post {
+  id              BigInt     @id @default(autoincrement())
+  title           String
+  country         String
+  duration        String
+  impression      Float
+  approximateCost Int        @map("approximate_cost")
+  description     String
+  comments        Comment[]
+  images          Image[]
+  mapPoints       MapPoint[]
+  userId          BigInt
+  author          User       @relation(fields: [userId], references: [id])
+}
+
+model Comment {
+  id     BigInt @id @default(autoincrement())
+  text   String
+  user   User   @relation(fields: [userId], references: [id])
+  userId BigInt
+  post   Post   @relation(fields: [postId], references: [id])
+  postId BigInt
+}
+
+model Image {
+  id     BigInt @id @default(autoincrement())
+  url    String
+  post   Post   @relation(fields: [postId], references: [id])
+  postId BigInt
+}
+
+model MapPoint {
+  id     BigInt @id @default(autoincrement())
+  lat    String
+  lng    String
+  title  String
+  post   Post   @relation(fields: [postId], references: [id])
+  postId BigInt
+}

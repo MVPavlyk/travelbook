@@ -11,8 +11,22 @@ export default {
       colors: {
         background: 'var(--background)',
         foreground: 'var(--foreground)',
+        gray: {
+          100: '#F2F2F2',
+          300: '#E4E4E4',
+          600: '#6E6E6E',
+          700: '#434A54',
+          800: '#2E3339',
+        },
+        iris: {
+          100: '#5D5FEF',
+          80: '#7879F1',
+        },
+        green: {
+          100: '#1BBC9B',
+        },
       },
     },
   },
-  plugins: [],
+  plugins: [require('@tailwindcss/line-clamp')],
 } satisfies Config;
