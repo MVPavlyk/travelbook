@@ -16,6 +16,8 @@ type CreatePost = {
   description: string;
 };
 
+//TODO: images upload, map points, country selector, duration selector?
+
 const CreatePostForm = () => {
   const methods = useForm<CreatePost>({
     defaultValues: {

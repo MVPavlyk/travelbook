@@ -5,7 +5,8 @@ import Image from 'next/image';
 import DurationIcon from '@/assets/icons/DurationIcon';
 import ImpressionIcon from '@/assets/icons/ImpressionIcon';
 import LocationIcon from '@/assets/icons/LocationIcon';
-import Button from '@/components/elements/Button';
+import LinkAsButton from '@/components/elements/LinkAsButton';
+import { STATIC_ROUTES } from '@/lib/constants/staticRoutes';
 
 type TPostCardProps = {
   post: Prisma.PostGetPayload<{
@@ -15,6 +16,7 @@ type TPostCardProps = {
 
 const PostCard: React.FC<TPostCardProps> = ({ post }) => {
   const {
+    id,
     images,
     title,
     duration,
@@ -55,7 +57,9 @@ const PostCard: React.FC<TPostCardProps> = ({ post }) => {
           <hr className="w-full h-[1px] bg-gray-300 mt-5" />
         </div>
         <div className="flex w-full items-center justify-between">
-          <Button>Details</Button>
+          <LinkAsButton href={`${STATIC_ROUTES.POST}/${id}`}>
+            Details
+          </LinkAsButton>
           <div className="text-right">
             <p className="text-gray-600">Total</p>
             <h5 className="font-bold text-2xl">{approximateCost}</h5>
