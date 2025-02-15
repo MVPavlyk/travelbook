@@ -14,17 +14,20 @@ datasource db {
 }
 
 model User {
-  id        BigInt    @id @default(autoincrement())
+  id        Int    @id @default(autoincrement())
   firstName String    @map("first_name")
   lastName  String    @map("last_name")
   email     String    @unique
   avatarUrl String    @map("avatar_url")
   comments  Comment[]
   posts     Post[]
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Post {
-  id              BigInt     @id @default(autoincrement())
+  id              Int     @id @default(autoincrement())
   title           String
   country         String
   duration        String
@@ -34,31 +37,39 @@ model Post {
   comments        Comment[]
   images          Image[]
   mapPoints       MapPoint[]
-  userId          BigInt
+  userId          Int
   author          User       @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Comment {
-  id     BigInt @id @default(autoincrement())
+  id     Int @id @default(autoincrement())
   text   String
   user   User   @relation(fields: [userId], references: [id])
-  userId BigInt
+  userId Int
   post   Post   @relation(fields: [postId], references: [id])
-  postId BigInt
+  postId Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Image {
-  id     BigInt @id @default(autoincrement())
+  id     Int @id @default(autoincrement())
   url    String
   post   Post   @relation(fields: [postId], references: [id])
-  postId BigInt
+  postId Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model MapPoint {
-  id     BigInt @id @default(autoincrement())
+  id     Int @id @default(autoincrement())
   lat    String
   lng    String
   title  String
   post   Post   @relation(fields: [postId], references: [id])
-  postId BigInt
+  postId Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

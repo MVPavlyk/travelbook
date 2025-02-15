@@ -23,6 +23,7 @@ export default {
           80: '#7879F1',
         },
         green: {
+          50: '#14B9D5',
           100: '#1BBC9B',
         },
       },

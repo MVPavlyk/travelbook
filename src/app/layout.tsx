@@ -21,7 +21,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistPoppins.className} antialiased`}>
-        <MainLayout>{children}</MainLayout>
+        {children}
       </body>
     </html>
   );

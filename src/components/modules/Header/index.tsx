@@ -2,8 +2,8 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import logo from '../../../assets/images/logo.png';
-import Button from '@/components/elements/Button';
 import { STATIC_ROUTES } from '@/lib/constants/staticRoutes';
+import UserNavigation from '@/components/units/UserNavigation';
 
 const Header = () => {
   return (
@@ -11,7 +11,7 @@ const Header = () => {
       <Link href={STATIC_ROUTES.HOME}>
         <Image src={logo} alt="logo" width={150} height={36} />
       </Link>
-      <Button>Login</Button>
+      <UserNavigation />
     </header>
   );
 };

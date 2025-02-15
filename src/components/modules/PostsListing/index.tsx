@@ -18,7 +18,7 @@ const PostListing = async () => {
       <section className="w-full grid grid-cols-3 gap-10">
         {posts?.map((post) => <PostCard key={post.id} post={post} />)}
       </section>
-      <Pagination total={97} />
+      <Pagination total={totalPosts} />
     </div>
   );
 };
