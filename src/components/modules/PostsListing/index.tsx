@@ -9,6 +9,9 @@ const PostListing = async () => {
       images: true,
       author: true,
     },
+    orderBy: {
+      createdAt: 'desc',
+    },
   });
 
   const totalPosts = await prismaClient.post.count();
