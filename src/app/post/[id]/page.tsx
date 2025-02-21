@@ -7,8 +7,10 @@ import PostCostIcon from '@/assets/icons/PostCostIcon';
 import PostImpressionIcon from '@/assets/icons/PostImpressionIcon';
 import MainLayout from '@/components/layouts/MainLayout';
 
-const Page = async ({ params }: { params: { id: string } }) => {
-  const { id: postId } = params;
+type TParams = Promise<{ id: string }>;
+
+const Page = async ({ params }: { params: TParams }) => {
+  const { id: postId } = await params;
 
   const post = await prismaClient.post.findUnique({
     where: {

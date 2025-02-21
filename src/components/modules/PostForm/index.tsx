@@ -6,6 +6,7 @@ import Input from '@/components/elements/Input';
 import Button from '@/components/elements/Button';
 import { useRouter } from 'next/navigation';
 import Textarea from '@/components/elements/Textarea';
+import { STATIC_ROUTES } from '@/lib/constants/staticRoutes';
 
 type CreatePost = {
   title: string;
@@ -52,7 +53,7 @@ const CreatePostForm = () => {
       return;
     }
 
-    router.push('/posts');
+    router.push(STATIC_ROUTES.HOME);
   };
 
   return (
