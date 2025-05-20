@@ -1,14 +1,18 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useTransition } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import Input from '@/components/elements/Input';
 import Button from '@/components/elements/Button';
 import { useRouter } from 'next/navigation';
 import Textarea from '@/components/elements/Textarea';
 import { STATIC_ROUTES } from '@/lib/constants/staticRoutes';
+import { createPostAction } from '@/actions/posts/createPostAction';
+import ImageUploader from '@/components/units/ImageUploader';
 
-type CreatePost = {
+//TODO: images upload, map points, country selector, duration selector?
+
+export type CreatePost = {
   title: string;
   country: string;
   duration: string;
@@ -16,8 +20,6 @@ type CreatePost = {
   approximateCost: string;
   description: string;
 };
-
-//TODO: images upload, map points, country selector, duration selector?
 
 const CreatePostForm = () => {
   const methods = useForm<CreatePost>({
@@ -33,27 +35,30 @@ const CreatePostForm = () => {
 
   const router = useRouter();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [isPending, startTransition] = useTransition();
 
-  const onSubmit = async (data: CreatePost) => {
-    setLoading(true);
+  const [selectedImages, setSelectedImages] = useState<File[]>([]);
+
+  const onSubmit = (data: CreatePost) => {
     setErrorMessage(null);
 
-    const response = await fetch('/api/posts', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
+    const formData = new FormData();
+    Object.entries(data).forEach(([key, value]) => {
+      formData.append(key, value);
     });
 
-    const resData = await response.json();
-    setLoading(false);
+    selectedImages.forEach((file) => {
+      formData.append('images', file); // ключ 'images' буде масивом файлів
+    });
 
-    if (!response.ok) {
-      setErrorMessage(resData.error || 'Something went wrong');
-      return;
-    }
-
-    router.push(STATIC_ROUTES.HOME);
+    startTransition(async () => {
+      try {
+        await createPostAction(formData);
+        router.push(STATIC_ROUTES.HOME);
+      } catch (error: any) {
+        setErrorMessage(error.message || 'Something went wrong');
+      }
+    });
   };
 
   return (
@@ -73,12 +78,6 @@ const CreatePostForm = () => {
             className="w-full"
             placeholder="Enter post title"
           />
-          {methods.formState.errors.title && (
-            <p className="text-red-500 text-sm">
-              {methods.formState.errors.title.message}
-            </p>
-          )}
-
           <Input
             name="country"
             label="Country"
@@ -86,12 +85,6 @@ const CreatePostForm = () => {
             className="w-full"
             placeholder="Enter country"
           />
-          {methods.formState.errors.country && (
-            <p className="text-red-500 text-sm">
-              {methods.formState.errors.country.message}
-            </p>
-          )}
-
           <Input
             name="duration"
             label="Duration"
@@ -99,12 +92,6 @@ const CreatePostForm = () => {
             className="w-full"
             placeholder="Enter duration (e.g. 5 days)"
           />
-          {methods.formState.errors.duration && (
-            <p className="text-red-500 text-sm">
-              {methods.formState.errors.duration.message}
-            </p>
-          )}
-
           <Input
             name="impression"
             label="Impression Score"
@@ -112,12 +99,6 @@ const CreatePostForm = () => {
             className="w-full"
             placeholder="Enter impression score (0-10)"
           />
-          {methods.formState.errors.impression && (
-            <p className="text-red-500 text-sm">
-              {methods.formState.errors.impression.message}
-            </p>
-          )}
-
           <Input
             name="approximateCost"
             label="Approximate Cost ($)"
@@ -125,23 +106,13 @@ const CreatePostForm = () => {
             className="w-full"
             placeholder="Enter cost in USD"
           />
-          {methods.formState.errors.approximateCost && (
-            <p className="text-red-500 text-sm">
-              {methods.formState.errors.approximateCost.message}
-            </p>
-          )}
-
           <Textarea
             name="description"
             label="Description"
             className="w-full"
             placeholder="Enter description"
           />
-          {methods.formState.errors.description && (
-            <p className="text-red-500 text-sm">
-              {methods.formState.errors.description.message}
-            </p>
-          )}
+          <ImageUploader onImagesChange={setSelectedImages} />
 
           {errorMessage && (
             <p className="text-red-500 text-sm bg-red-100 p-2 rounded-md">
@@ -151,9 +122,9 @@ const CreatePostForm = () => {
 
           <Button
             className="bg-blue-500 text-white w-full p-2 rounded-md hover:bg-blue-600 transition duration-300"
-            disabled={loading}
+            disabled={isPending}
           >
-            {loading ? 'Creating Post...' : 'Create Post'}
+            {isPending ? 'Creating Post...' : 'Create Post'}
           </Button>
         </form>
       </FormProvider>

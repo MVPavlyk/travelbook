@@ -6,6 +6,7 @@ import PostDurationIcon from '@/assets/icons/PostDurationIcon';
 import PostCostIcon from '@/assets/icons/PostCostIcon';
 import PostImpressionIcon from '@/assets/icons/PostImpressionIcon';
 import MainLayout from '@/components/layouts/MainLayout';
+import ImageCarousel from '@/components/units/ImageCarousel';
 
 type TParams = Promise<{ id: string }>;
 
@@ -16,12 +17,22 @@ const Page = async ({ params }: { params: TParams }) => {
     where: {
       id: Number(postId),
     },
+    include: {
+      images: true,
+    },
   });
 
   if (!post) return NotFound();
 
-  const { title, description, country, approximateCost, impression, duration } =
-    post;
+  const {
+    title,
+    description,
+    country,
+    approximateCost,
+    impression,
+    duration,
+    images,
+  } = post;
 
   const TOPBLOCK_POINTS = [
     {
@@ -53,6 +64,7 @@ const Page = async ({ params }: { params: TParams }) => {
             <p className="text-gray-600">{country}</p>
           </div>
         </div>
+
         <div className="w-2/3 grid grid-cols-3">
           {TOPBLOCK_POINTS.map(({ Icon, label, value }) => (
             <div key={label} className="flex items-center gap-x-7">
@@ -65,6 +77,8 @@ const Page = async ({ params }: { params: TParams }) => {
           ))}
         </div>
       </div>
+      <ImageCarousel images={images} />
+
       <div className="w-full px-60 py-16">
         <h3 className="text-2xl font-bold">How it was</h3>
         <p className="w-full whitespace-pre-line text-gray-600">

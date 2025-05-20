@@ -3,31 +3,34 @@
 @tailwind utilities;
 
 :root {
-    --background: #ffffff;
-    --foreground: #171717;
+  --background: #ffffff;
+  --foreground: #171717;
 }
 
 @media (prefers-color-scheme: dark) {
-    :root {
-        --background: #0a0a0a;
-        --foreground: #ededed;
-    }
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
 }
 
 body {
-    color: var(--foreground);
-    background: var(--background);
-    font-family: Arial, Helvetica, sans-serif;
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 .main-footer {
-    background: url("../assets/images/footerBg.jpg") no-repeat center center / cover;
+  background: url('../assets/images/footerBg.jpg') no-repeat center center /
+    cover;
 }
 
 .homepage-top {
-    background: url("../assets/images/homepageBg.jpg") no-repeat center bottom / cover;
+  background: url('../assets/images/homepageBg.jpg') no-repeat center bottom /
+    cover;
 }
 
 .login-bg {
-    background: url("../assets/images/loginBg.jpg") no-repeat center center / cover;
+  background: url('../assets/images/loginBg.jpg') no-repeat center center /
+    cover;
 }

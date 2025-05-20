@@ -1,5 +1,5 @@
 export default function buildQueryParams(
-  params: Record<string, string | string[] | undefined>,
+  params: Record<string, string | string[] | undefined>
 ): string {
   if (!params || Object.keys(params).length === 0) return '';
 
