@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 type ImageWithPreview = {
   file: File;
@@ -9,9 +9,10 @@ type ImageWithPreview = {
 
 type Props = {
   onImagesChange: (images: File[]) => void;
+  resetTrigger?: number; // буде змінюватися після сабміту
 };
 
-const ImageUploader = ({ onImagesChange }: Props) => {
+const ImageUploader = ({ onImagesChange, resetTrigger }: Props) => {
   const [images, setImages] = useState<ImageWithPreview[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -33,6 +34,12 @@ const ImageUploader = ({ onImagesChange }: Props) => {
     onImagesChange(updated.map((img) => img.file));
   };
 
+  // 🧹 очищення превʼю при зовнішньому тригері
+  useEffect(() => {
+    setImages([]);
+    onImagesChange([]);
+  }, [resetTrigger]);
+
   return (
     <div>
       <input
@@ -53,7 +60,11 @@ const ImageUploader = ({ onImagesChange }: Props) => {
       <div className="flex flex-wrap gap-4">
         {images.map((img, index) => (
           <div key={index} className="relative">
-            <img src={img.preview} className="w-32 h-32 object-cover rounded" />
+            <img
+              src={img.preview}
+              className="w-32 h-32 object-cover rounded"
+              alt={`preview-${index}`}
+            />
             <button
               type="button"
               onClick={() => removeImage(index)}

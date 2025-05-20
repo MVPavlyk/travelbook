@@ -54,7 +54,10 @@ const RegistrationForm = () => {
     <div className="text-center flex flex-col items-center">
       <h3 className="text-4xl text-gray-700 font-semibold mb-10">Sign Up</h3>
       <FormProvider {...methods}>
-        <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-4">
+        <form
+          onSubmit={methods.handleSubmit(onSubmit)}
+          className="space-y-4 w-[320px]"
+        >
           <Input
             name="firstName"
             label="First Name"

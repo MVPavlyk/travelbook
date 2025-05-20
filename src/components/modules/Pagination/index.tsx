@@ -22,7 +22,7 @@ const Pagination: React.FC<TPaginationProps> = ({ total: totalItems }) => {
   const router = useRouter();
   const pathname = usePathname();
 
-  if (!totalItems) return null;
+  if (!totalItems || totalItems <= perPage) return null;
 
   const page = searchParams.get('page');
 

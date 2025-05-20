@@ -10,7 +10,17 @@ import { STATIC_ROUTES } from '@/lib/constants/staticRoutes';
 
 type TPostCardProps = {
   post: Prisma.PostGetPayload<{
-    include: { images: true; author: true };
+    include: {
+      images: true;
+      author: {
+        select: {
+          id: true;
+          firstName: true;
+          lastName: true;
+          avatarUrl: true;
+        };
+      };
+    };
   }>;
 };
 
@@ -62,7 +72,7 @@ const PostCard: React.FC<TPostCardProps> = ({ post }) => {
           </LinkAsButton>
           <div className="text-right">
             <p className="text-gray-600">Total</p>
-            <h5 className="font-bold text-2xl">{approximateCost}</h5>
+            <h5 className="font-bold text-2xl">{approximateCost} $</h5>
           </div>
         </div>
       </div>

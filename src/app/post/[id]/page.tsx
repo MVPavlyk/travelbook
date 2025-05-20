@@ -7,6 +7,8 @@ import PostCostIcon from '@/assets/icons/PostCostIcon';
 import PostImpressionIcon from '@/assets/icons/PostImpressionIcon';
 import MainLayout from '@/components/layouts/MainLayout';
 import ImageCarousel from '@/components/units/ImageCarousel';
+import CreateCommentForm from '@/components/modules/CommentsForm';
+import PostCommentsSection from '@/components/modules/PostComments';
 
 type TParams = Promise<{ id: string }>;
 
@@ -78,12 +80,15 @@ const Page = async ({ params }: { params: TParams }) => {
         </div>
       </div>
       <ImageCarousel images={images} />
-
       <div className="w-full px-60 py-16">
         <h3 className="text-2xl font-bold">How it was</h3>
         <p className="w-full whitespace-pre-line text-gray-600">
           {description}
         </p>
+      </div>
+      <div className="w-full flex flex-col pb-16 gap-y-10 items-center j">
+        <CreateCommentForm postId={postId} />
+        <PostCommentsSection postId={postId} />
       </div>
     </MainLayout>
   );
