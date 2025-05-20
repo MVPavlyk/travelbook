@@ -4,6 +4,7 @@ import CreatePostForm from '@/components/modules/PostForm';
 import { getSession } from '@/lib/auth/getAuth';
 import { redirect } from 'next/navigation';
 import { STATIC_ROUTES } from '@/lib/constants/staticRoutes';
+import { getCountriesAction } from '@/actions/countries/getCountriesAction';
 
 const CreatePost = async () => {
   const session = await getSession();
@@ -12,9 +13,11 @@ const CreatePost = async () => {
     redirect(STATIC_ROUTES.LOGIN);
   }
 
+  const countries = await getCountriesAction();
+
   return (
     <MainLayout>
-      <CreatePostForm />
+      <CreatePostForm countries={countries} />
     </MainLayout>
   );
 };

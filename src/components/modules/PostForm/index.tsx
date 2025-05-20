@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useTransition } from 'react';
+import React, { FC, useState, useTransition } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import Input from '@/components/elements/Input';
 import Button from '@/components/elements/Button';
@@ -9,6 +9,8 @@ import Textarea from '@/components/elements/Textarea';
 import { STATIC_ROUTES } from '@/lib/constants/staticRoutes';
 import { createPostAction } from '@/actions/posts/createPostAction';
 import ImageUploader from '@/components/units/ImageUploader';
+import { TCountry } from '@/lib/types/county';
+import SelectInput from '@/components/elements/Select';
 
 //TODO: images upload, map points, country selector, duration selector?
 
@@ -16,19 +18,23 @@ export type CreatePost = {
   title: string;
   country: string;
   duration: string;
-  impression: string;
-  approximateCost: string;
+  impression: number;
+  approximateCost: number;
   description: string;
 };
 
-const CreatePostForm = () => {
+type TCreatePostForm = {
+  countries: TCountry[] | null;
+};
+
+const CreatePostForm: FC<TCreatePostForm> = ({ countries }) => {
   const methods = useForm<CreatePost>({
     defaultValues: {
       title: '',
       country: '',
       duration: '',
-      impression: '',
-      approximateCost: '',
+      impression: 0,
+      approximateCost: 0,
       description: '',
     },
   });
@@ -44,7 +50,7 @@ const CreatePostForm = () => {
 
     const formData = new FormData();
     Object.entries(data).forEach(([key, value]) => {
-      formData.append(key, value);
+      formData.append(key, String(value));
     });
 
     selectedImages.forEach((file) => {
@@ -78,10 +84,17 @@ const CreatePostForm = () => {
             className="w-full"
             placeholder="Enter post title"
           />
-          <Input
+          <SelectInput
+            options={
+              countries
+                ? countries?.map((el) => ({
+                    label: el.name,
+                    value: el.name,
+                  }))
+                : []
+            }
             name="country"
             label="Country"
-            type="text"
             className="w-full"
             placeholder="Enter country"
           />
@@ -95,14 +108,20 @@ const CreatePostForm = () => {
           <Input
             name="impression"
             label="Impression Score"
-            type="number"
+            type="range"
             className="w-full"
+            min={0}
+            max={10}
+            step={1}
             placeholder="Enter impression score (0-10)"
           />
           <Input
             name="approximateCost"
             label="Approximate Cost ($)"
-            type="number"
+            type="range"
+            min={0}
+            max={50000}
+            step={100}
             className="w-full"
             placeholder="Enter cost in USD"
           />
