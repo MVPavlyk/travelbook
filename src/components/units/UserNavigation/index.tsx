@@ -1,27 +1,20 @@
-import React from 'react';
-import { STATIC_ROUTES } from '@/lib/constants/staticRoutes';
-import LinkAsButton from '@/components/elements/LinkAsButton';
-import UserIcon from '@/assets/icons/UserIcon';
-import { getSession } from '@/lib/auth/getAuth';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth/authOptions';
 import LogoutButton from '@/components/units/LogoutButton';
+import UserUpdateModal from '@/components/modules/UpdateUserModal';
+import LinkAsButton from '@/components/elements/LinkAsButton';
+import { STATIC_ROUTES } from '@/lib/constants/staticRoutes';
 
 const UserNavigation = async () => {
-  const session = await getSession();
+  const session = await getServerSession(authOptions);
 
   if (!session) {
     return <LinkAsButton href={STATIC_ROUTES.LOGIN}>Login</LinkAsButton>;
   }
 
-  const { firstName, lastName } = session.user;
-
   return (
     <div className="flex items-center gap-x-3">
-      <div className="flex items-center gap-x-2">
-        <UserIcon />
-        <p className="text-green-50 font-medium">
-          {firstName} {lastName}
-        </p>
-      </div>
+      {!!session?.user && <UserUpdateModal user={session?.user} />}
       <LogoutButton />
     </div>
   );

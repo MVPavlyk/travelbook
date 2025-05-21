@@ -33,12 +33,15 @@ export const authOptions: NextAuthOptions = {
           throw new Error('Invalid password');
         }
 
+        const isAdmin = user.email === process.env.ADMIN_EMAIL;
+
         return {
           id: user.id.toString(),
           firstName: user.firstName,
           lastName: user.lastName,
           email: user.email,
           avatarUrl: user.avatarUrl,
+          role: isAdmin ? 'admin' : 'user',
         };
       },
     }),
@@ -54,6 +57,7 @@ export const authOptions: NextAuthOptions = {
         token.lastName = user.lastName;
         token.email = user.email;
         token.avatarUrl = user.avatarUrl;
+        token.role = user.role;
       }
       return token;
     },
@@ -64,6 +68,7 @@ export const authOptions: NextAuthOptions = {
         session.user.lastName = token.lastName;
         session.user.email = token.email;
         session.user.avatarUrl = token.avatarUrl;
+        session.user.role = token.role;
       }
       return session;
     },

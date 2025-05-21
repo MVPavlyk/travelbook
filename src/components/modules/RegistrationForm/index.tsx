@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useTransition } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import Input from '@/components/elements/Input';
 import Button from '@/components/elements/Button';
@@ -8,6 +8,7 @@ import { User } from '@prisma/client';
 import { useRouter } from 'next/navigation';
 import { STATIC_ROUTES } from '@/lib/constants/staticRoutes';
 import Link from 'next/link';
+import { signUpAction } from '@/actions/user/signUpAction';
 
 type RegistrationUser = Pick<
   User,
@@ -27,27 +28,19 @@ const RegistrationForm = () => {
   const router = useRouter();
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [isPending, startTransition] = useTransition();
 
-  const onSubmit = async (data: RegistrationUser) => {
-    setLoading(true);
+  const onSubmit = (data: RegistrationUser) => {
     setErrorMessage(null);
 
-    const response = await fetch('/api/auth/sign-up', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
+    startTransition(async () => {
+      try {
+        await signUpAction(data);
+        router.push(STATIC_ROUTES.LOGIN);
+      } catch (error: any) {
+        setErrorMessage(error.message || 'Something went wrong');
+      }
     });
-
-    const resData = await response.json();
-    setLoading(false);
-
-    if (!response.ok) {
-      setErrorMessage(resData.error || 'Something went wrong');
-      return;
-    }
-
-    router.push(STATIC_ROUTES.LOGIN);
   };
 
   return (
@@ -80,7 +73,7 @@ const RegistrationForm = () => {
             name="password"
             label="Password"
             type="password"
-            placeholder="1111"
+            placeholder="••••"
           />
 
           {errorMessage && (
@@ -89,8 +82,8 @@ const RegistrationForm = () => {
             </p>
           )}
 
-          <Button className="bg-green-100">
-            {loading ? 'Wait...' : 'Submit'}
+          <Button className="bg-green-100" disabled={isPending}>
+            {isPending ? 'Wait...' : 'Submit'}
           </Button>
         </form>
         <p className="text-center text-sm text-gray-600 mt-4">

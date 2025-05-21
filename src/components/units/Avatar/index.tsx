@@ -34,13 +34,17 @@ function hashColor(name: string): string {
 export default function Avatar({ user, size = 40 }: AvatarProps) {
   if (user.avatarUrl) {
     return (
-      <Image
-        src={user.avatarUrl}
-        alt={`${user.firstName} ${user.lastName}`}
-        width={size}
-        height={size}
-        className="rounded-full object-cover"
-      />
+      <div
+        style={{ width: size, height: size }}
+        className="relative rounded-full overflow-hidden"
+      >
+        <Image
+          src={user.avatarUrl}
+          alt={`${user.firstName} ${user.lastName}`}
+          fill
+          className="object-cover"
+        />
+      </div>
     );
   }
 

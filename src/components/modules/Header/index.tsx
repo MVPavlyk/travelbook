@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import logo from '../../../assets/images/logo.png';
+import logo from '../../../assets/images/logo.svg';
 import { STATIC_ROUTES } from '@/lib/constants/staticRoutes';
 import UserNavigation from '@/components/units/UserNavigation';
 import { getSession } from '@/lib/auth/getAuth';

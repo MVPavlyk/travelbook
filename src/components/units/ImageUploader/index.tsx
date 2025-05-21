@@ -9,20 +9,22 @@ type ImageWithPreview = {
 
 type Props = {
   onImagesChange: (images: File[]) => void;
-  resetTrigger?: number; // буде змінюватися після сабміту
+  resetTrigger?: number;
+  max?: number;
 };
 
-const ImageUploader = ({ onImagesChange, resetTrigger }: Props) => {
+const ImageUploader = ({ onImagesChange, resetTrigger, max = 1 }: Props) => {
   const [images, setImages] = useState<ImageWithPreview[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFilesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    const newImages = files.map((file) => ({
+    const newImages = files.slice(0, max).map((file) => ({
       file,
       preview: URL.createObjectURL(file),
     }));
-    const updated = [...images, ...newImages];
+
+    const updated = [...images, ...newImages].slice(0, max);
     setImages(updated);
     onImagesChange(updated.map((img) => img.file));
   };
@@ -34,7 +36,6 @@ const ImageUploader = ({ onImagesChange, resetTrigger }: Props) => {
     onImagesChange(updated.map((img) => img.file));
   };
 
-  // 🧹 очищення превʼю при зовнішньому тригері
   useEffect(() => {
     setImages([]);
     onImagesChange([]);
@@ -45,18 +46,20 @@ const ImageUploader = ({ onImagesChange, resetTrigger }: Props) => {
       <input
         type="file"
         accept="image/*"
-        multiple
+        multiple={max > 1}
         onChange={handleFilesChange}
         ref={fileInputRef}
         hidden
       />
-      <button
-        type="button"
-        className="mb-4 px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
-        onClick={() => fileInputRef.current?.click()}
-      >
-        Add Images
-      </button>
+      {images.length < max && (
+        <button
+          type="button"
+          className="mb-4 px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+          onClick={() => fileInputRef.current?.click()}
+        >
+          Add Image
+        </button>
+      )}
       <div className="flex flex-wrap gap-4">
         {images.map((img, index) => (
           <div key={index} className="relative">

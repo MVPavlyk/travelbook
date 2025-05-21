@@ -1,6 +1,10 @@
 import { getPostCommentsAction } from '@/actions/comments/getPostCommentsAction';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth/authOptions';
+
 import Image from 'next/image';
 import Avatar from '@/components/units/Avatar';
+import DeleteCommentButton from '@/components/units/DeleteCommentButton';
 
 type Props = {
   postId: string;
@@ -8,6 +12,7 @@ type Props = {
 
 export default async function PostCommentsSection({ postId }: Props) {
   const comments = await getPostCommentsAction(postId);
+  const session = await getServerSession(authOptions);
 
   return (
     <div className="w-full max-w-3xl mx-auto mt-12 space-y-10">
@@ -44,6 +49,9 @@ export default async function PostCommentsSection({ postId }: Props) {
                     })}
                   </p>
                 </div>
+                {session?.user.role === 'admin' && (
+                  <DeleteCommentButton commentId={comment.id} />
+                )}
               </div>
 
               <p className="text-gray-700 whitespace-pre-line">

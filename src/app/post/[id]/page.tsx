@@ -1,4 +1,7 @@
 import React from 'react';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth/authOptions';
+
 import { prismaClient } from '@/lib/prisma';
 import NotFound from 'next/dist/client/components/not-found-error';
 import LocationIcon from '@/assets/icons/LocationIcon';
@@ -9,10 +12,13 @@ import MainLayout from '@/components/layouts/MainLayout';
 import ImageCarousel from '@/components/units/ImageCarousel';
 import CreateCommentForm from '@/components/modules/CommentsForm';
 import PostCommentsSection from '@/components/modules/PostComments';
+import DeletePostButton from '@/components/units/DeletePostButton';
 
 type TParams = Promise<{ id: string }>;
 
 const Page = async ({ params }: { params: TParams }) => {
+  const session = await getServerSession(authOptions);
+
   const { id: postId } = await params;
 
   const post = await prismaClient.post.findUnique({
@@ -80,6 +86,9 @@ const Page = async ({ params }: { params: TParams }) => {
         </div>
       </div>
       <ImageCarousel images={images} />
+      {session?.user.role === 'admin' && (
+        <DeletePostButton postId={Number(postId)} />
+      )}
       <div className="w-full px-60 py-16">
         <h3 className="text-2xl font-bold">How it was</h3>
         <p className="w-full whitespace-pre-line text-gray-600">
