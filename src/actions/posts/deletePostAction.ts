@@ -1,12 +1,11 @@
 'use server';
 
 import { prismaClient } from '@/lib/prisma';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth/authOptions';
 import { revalidatePath } from 'next/cache';
+import { getSessionAction } from '@/actions/user/getSessionAction';
 
 export async function deletePostAction(postId: number) {
-  const session = await getServerSession(authOptions);
+  const session = await getSessionAction();
 
   if (!session || session.user.role !== 'admin') {
     throw new Error('Unauthorized');

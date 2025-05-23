@@ -1,13 +1,12 @@
 'use server';
 
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth/authOptions';
 import { prismaClient } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { uploadImageAction } from '@/actions/images/uploadImageAction';
+import { getSessionAction } from '@/actions/user/getSessionAction';
 
 export async function createPostAction(formData: FormData) {
-  const session = await getServerSession(authOptions);
+  const session = await getSessionAction();
   if (!session) throw new Error('Unauthorized');
 
   const title = formData.get('title') as string;
@@ -43,10 +42,10 @@ export async function createPostAction(formData: FormData) {
       title,
       country,
       duration,
-      impression: parseFloat(impression),
-      approximateCost: parseInt(approximateCost, 10),
+      impression: Number(impression),
+      approximateCost: Number(approximateCost),
       description,
-      userId: parseInt(session.user.id, 10),
+      userId: session.user.id,
       images: {
         create: uploadedUrls.map((url) => ({ url })),
       },

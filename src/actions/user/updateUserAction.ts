@@ -1,14 +1,13 @@
 'use server';
 
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth/authOptions';
 import { prismaClient } from '@/lib/prisma';
 import { uploadImageAction } from '@/actions/images/uploadImageAction';
 import { revalidatePath } from 'next/cache';
+import { getSessionAction } from '@/actions/user/getSessionAction';
 
 export async function updateUserAction(formData: FormData) {
-  const session = await getServerSession(authOptions);
-  if (!session) throw new Error('Unauthorized');
+  const session = await getSessionAction();
+  if (!session?.user) throw new Error('Unauthorized');
 
   const firstName = formData.get('firstName') as string;
   const lastName = formData.get('lastName') as string;
@@ -26,7 +25,7 @@ export async function updateUserAction(formData: FormData) {
   }
 
   const updatedUser = await prismaClient.user.update({
-    where: { id: parseInt(session.user.id, 10) },
+    where: { id: session?.user?.id },
     data: {
       firstName,
       lastName,

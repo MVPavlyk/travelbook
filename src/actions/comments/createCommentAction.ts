@@ -1,13 +1,12 @@
 'use server';
 
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth/authOptions';
 import { prismaClient } from '@/lib/prisma';
 import { uploadImageAction } from '@/actions/images/uploadImageAction';
 import { revalidatePath } from 'next/cache';
+import { getSessionAction } from '@/actions/user/getSessionAction';
 
 export async function createCommentAction(formData: FormData) {
-  const session = await getServerSession(authOptions);
+  const session = await getSessionAction();
   if (!session) throw new Error('Unauthorized');
 
   const postId = formData.get('postId');
@@ -26,8 +25,8 @@ export async function createCommentAction(formData: FormData) {
   const newComment = await prismaClient.comment.create({
     data: {
       text: text as string,
-      postId: parseInt(postId as string, 10),
-      userId: parseInt(session.user.id, 10),
+      postId: Number(postId),
+      userId: session.user.id,
       images: {
         create: uploadedUrls.map((url) => ({ url })),
       },

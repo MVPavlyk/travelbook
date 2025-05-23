@@ -1,10 +1,9 @@
 import { getPostCommentsAction } from '@/actions/comments/getPostCommentsAction';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth/authOptions';
 
 import Image from 'next/image';
 import Avatar from '@/components/units/Avatar';
 import DeleteCommentButton from '@/components/units/DeleteCommentButton';
+import { getSessionAction } from '@/actions/user/getSessionAction';
 
 type Props = {
   postId: string;
@@ -12,7 +11,7 @@ type Props = {
 
 export default async function PostCommentsSection({ postId }: Props) {
   const comments = await getPostCommentsAction(postId);
-  const session = await getServerSession(authOptions);
+  const session = await getSessionAction();
 
   return (
     <div className="w-full max-w-3xl mx-auto mt-12 space-y-10">

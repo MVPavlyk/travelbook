@@ -1,6 +1,4 @@
 import React from 'react';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth/authOptions';
 
 import { prismaClient } from '@/lib/prisma';
 import NotFound from 'next/dist/client/components/not-found-error';
@@ -13,11 +11,12 @@ import ImageCarousel from '@/components/units/ImageCarousel';
 import CreateCommentForm from '@/components/modules/CommentsForm';
 import PostCommentsSection from '@/components/modules/PostComments';
 import DeletePostButton from '@/components/units/DeletePostButton';
+import { getSessionAction } from '@/actions/user/getSessionAction';
 
 type TParams = Promise<{ id: string }>;
 
 const Page = async ({ params }: { params: TParams }) => {
-  const session = await getServerSession(authOptions);
+  const session = await getSessionAction();
 
   const { id: postId } = await params;
 

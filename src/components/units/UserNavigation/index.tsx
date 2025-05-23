@@ -1,12 +1,11 @@
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth/authOptions';
 import LogoutButton from '@/components/units/LogoutButton';
 import UserUpdateModal from '@/components/modules/UpdateUserModal';
 import LinkAsButton from '@/components/elements/LinkAsButton';
 import { STATIC_ROUTES } from '@/lib/constants/staticRoutes';
+import { getSessionAction } from '@/actions/user/getSessionAction';
 
 const UserNavigation = async () => {
-  const session = await getServerSession(authOptions);
+  const session = await getSessionAction();
 
   if (!session) {
     return <LinkAsButton href={STATIC_ROUTES.LOGIN}>Login</LinkAsButton>;
