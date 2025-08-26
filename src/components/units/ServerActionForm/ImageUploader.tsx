@@ -23,7 +23,7 @@ export default function ImageUploader({
   const [images, setImages] = useState<ImageWithPreview[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const { errors } = useFormStateCtx();
+  const { errors, ok } = useFormStateCtx();
   const error = errors?.[name];
 
   const syncToInput = (files: File[]) => {
@@ -52,6 +52,17 @@ export default function ImageUploader({
   useEffect(() => {
     return () => images.forEach((i) => URL.revokeObjectURL(i.preview));
   }, [images]);
+
+  useEffect(() => {
+    if (!ok) return;
+    setImages((prev) => {
+      prev.forEach((i) => URL.revokeObjectURL(i.preview));
+      return [];
+    });
+    if (inputRef.current) {
+      inputRef.current.value = '';
+    }
+  }, [ok]);
 
   return (
     <div className="w-full">

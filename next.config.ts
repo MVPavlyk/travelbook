@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '**', // Дозволяє завантаження з будь-якого домену
+        hostname: '**',
       },
     ],
   },
