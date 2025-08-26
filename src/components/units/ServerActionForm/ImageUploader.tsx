@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import { useId } from 'react';
+import { useFormStateCtx } from '@/components/units/ServerActionForm';
 
 type ImageWithPreview = { file: File; preview: string };
 
@@ -17,8 +19,12 @@ export default function ImageUploader({
   accept = 'image/*',
   multiple = true,
 }: Props) {
+  const id = useId();
   const [images, setImages] = useState<ImageWithPreview[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const { errors } = useFormStateCtx();
+  const error = errors?.[name];
 
   const syncToInput = (files: File[]) => {
     if (!inputRef.current) return;
@@ -51,13 +57,15 @@ export default function ImageUploader({
     <div className="w-full">
       <input
         ref={inputRef}
-        id={name}
+        id={id}
         name={name}
         type="file"
         accept={accept}
         multiple={multiple && max > 1}
         className="hidden"
         onChange={handleFilesChange}
+        aria-invalid={!!error}
+        aria-describedby={error ? `${id}-error` : undefined}
       />
 
       <div className="flex items-center gap-3 mb-3">
@@ -92,6 +100,12 @@ export default function ImageUploader({
           </div>
         ))}
       </div>
+
+      {error && (
+        <span id={`${id}-error`} className="text-red-500 text-sm">
+          {error}
+        </span>
+      )}
     </div>
   );
 }
