@@ -28,7 +28,7 @@ export async function uploadImageAction(file: File): Promise<string | null> {
       blobHTTPHeaders: { blobContentType: file.type },
     });
 
-    return blockBlobClient.url;
+    return blockBlobClient.url.split('?')[0];
   } catch (e) {
     console.error(e);
     return null;
