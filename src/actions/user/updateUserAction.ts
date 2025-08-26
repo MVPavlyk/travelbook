@@ -1,4 +1,3 @@
-// actions/user/updateUserAction.ts
 'use server';
 
 import { prismaClient } from '@/lib/prisma';
