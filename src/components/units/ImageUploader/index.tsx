@@ -1,65 +1,97 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import { useId } from 'react';
+import { useFormStateCtx } from '@/components/units/ServerActionForm';
 
-type ImageWithPreview = {
-  file: File;
-  preview: string;
-};
+type ImageWithPreview = { file: File; preview: string };
 
 type Props = {
-  onImagesChange: (images: File[]) => void;
-  resetTrigger?: number;
+  name: string;
   max?: number;
+  accept?: string;
+  multiple?: boolean;
 };
 
-const ImageUploader = ({ onImagesChange, resetTrigger, max = 1 }: Props) => {
+export default function ImageUploader({
+  name,
+  max = 10,
+  accept = 'image/*',
+  multiple = true,
+}: Props) {
+  const id = useId();
   const [images, setImages] = useState<ImageWithPreview[]>([]);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleFilesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    const newImages = files.slice(0, max).map((file) => ({
-      file,
-      preview: URL.createObjectURL(file),
-    }));
+  const { errors, ok } = useFormStateCtx();
+  const error = errors?.[name];
 
-    const updated = [...images, ...newImages].slice(0, max);
-    setImages(updated);
-    onImagesChange(updated.map((img) => img.file));
+  const syncToInput = (files: File[]) => {
+    if (!inputRef.current) return;
+    const dt = new DataTransfer();
+    files.slice(0, max).forEach((f) => dt.items.add(f));
+    inputRef.current.files = dt.files;
   };
 
-  const removeImage = (index: number) => {
-    const updated = [...images];
-    updated.splice(index, 1);
-    setImages(updated);
-    onImagesChange(updated.map((img) => img.file));
+  const handleFilesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const picked = Array.from(e.target.files || []);
+    const next = [
+      ...images,
+      ...picked.map((file) => ({ file, preview: URL.createObjectURL(file) })),
+    ].slice(0, max);
+    setImages(next);
+    syncToInput(next.map((i) => i.file));
+  };
+
+  const removeImage = (idx: number) => {
+    const next = images.filter((_, i) => i !== idx);
+    setImages(next);
+    syncToInput(next.map((i) => i.file));
   };
 
   useEffect(() => {
-    setImages([]);
-    onImagesChange([]);
-  }, [resetTrigger]);
+    return () => images.forEach((i) => URL.revokeObjectURL(i.preview));
+  }, [images]);
+
+  useEffect(() => {
+    if (!ok) return;
+    setImages((prev) => {
+      prev.forEach((i) => URL.revokeObjectURL(i.preview));
+      return [];
+    });
+    if (inputRef.current) {
+      inputRef.current.value = '';
+    }
+  }, [ok]);
 
   return (
-    <div>
+    <div className="w-full">
       <input
+        ref={inputRef}
+        id={id}
+        name={name}
         type="file"
-        accept="image/*"
-        multiple={max > 1}
+        accept={accept}
+        multiple={multiple && max > 1}
+        className="hidden"
         onChange={handleFilesChange}
-        ref={fileInputRef}
-        hidden
+        aria-invalid={!!error}
+        aria-describedby={error ? `${id}-error` : undefined}
       />
-      {images.length < max && (
+
+      <div className="flex items-center gap-3 mb-3">
         <button
           type="button"
-          className="mb-4 px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
-          onClick={() => fileInputRef.current?.click()}
+          className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+          onClick={() => inputRef.current?.click()}
         >
-          Add Image
+          {images.length ? 'Add more' : 'Add Image'}
         </button>
-      )}
+        <span className="text-sm text-gray-600">
+          {images.length}/{max}
+        </span>
+      </div>
+
       <div className="flex flex-wrap gap-4">
         {images.map((img, index) => (
           <div key={index} className="relative">
@@ -72,14 +104,19 @@ const ImageUploader = ({ onImagesChange, resetTrigger, max = 1 }: Props) => {
               type="button"
               onClick={() => removeImage(index)}
               className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 text-xs"
+              aria-label="Remove image"
             >
               ✕
             </button>
           </div>
         ))}
       </div>
+
+      {error && (
+        <span id={`${id}-error`} className="text-red-500 text-sm">
+          {error}
+        </span>
+      )}
     </div>
   );
-};
-
-export default ImageUploader;
+}

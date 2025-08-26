@@ -2,13 +2,13 @@
 
 import React, { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import Input from '@/components/elements/Input';
 import Button from '@/components/elements/Button';
 import { signIn } from 'next-auth/react';
 import { User } from '@prisma/client';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { STATIC_ROUTES } from '@/lib/constants/staticRoutes';
+import Input from '@/components/elements/RHFInput';
 
 type LoginUser = Pick<User, 'email' | 'password'>;
 

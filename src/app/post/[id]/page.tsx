@@ -59,8 +59,6 @@ const Page = async ({ params }: { params: TParams }) => {
     },
   ];
 
-  //TODO: images carousel, map, comments?
-
   return (
     <MainLayout>
       <div className="w-full h-[200px] bg-gray-100 px-60 flex items-center justify-between">

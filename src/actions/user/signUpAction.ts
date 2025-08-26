@@ -2,34 +2,49 @@
 
 import bcrypt from 'bcryptjs';
 import { prismaClient } from '@/lib/prisma';
+import { redirect } from 'next/navigation';
+import { signUpSchema } from '@/lib/validation/users';
+import { zodToErrors } from '@/lib/validation/utils';
+import { STATIC_ROUTES } from '@/lib/constants/staticRoutes';
+import { FormState } from '@/lib/types/form';
 
-type RegisterUserInput = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-};
+export async function signUpAction(
+  _prev: FormState,
+  formData: FormData
+): Promise<FormState> {
+  const raw = {
+    firstName: String(formData.get('firstName') ?? ''),
+    lastName: String(formData.get('lastName') ?? ''),
+    email: String(formData.get('email') ?? ''),
+    password: String(formData.get('password') ?? ''),
+  };
 
-export async function signUpAction(data: RegisterUserInput) {
-  const { firstName, lastName, email, password } = data;
-
-  const existingUser = await prismaClient.user.findUnique({
-    where: { email },
-  });
-
-  if (existingUser) {
-    throw new Error('Email already exists');
+  const parsed = signUpSchema.safeParse(raw);
+  if (!parsed.success) {
+    return { errors: zodToErrors(parsed.error), values: raw };
   }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+  const parsedData = parsed.data;
+  const email = parsedData.email.toLowerCase();
 
-  return prismaClient.user.create({
+  const exists = await prismaClient.user.findUnique({ where: { email } });
+  if (exists) {
+    return {
+      errors: { email: 'Email already exists.' },
+      values: { ...raw, email },
+    };
+  }
+
+  const hashed = await bcrypt.hash(parsedData.password, 10);
+  await prismaClient.user.create({
     data: {
-      firstName,
-      lastName,
+      firstName: parsedData.firstName,
+      lastName: parsedData.lastName,
       email,
-      password: hashedPassword,
+      password: hashed,
       avatarUrl: '',
     },
   });
+
+  redirect(STATIC_ROUTES.LOGIN);
 }

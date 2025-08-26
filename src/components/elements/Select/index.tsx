@@ -1,122 +1,84 @@
 'use client';
 
-import { useFormContext, Controller } from 'react-hook-form';
-import Select from 'react-select';
+import dynamic from 'next/dynamic';
+
+const ReactSelect = dynamic(() => import('react-select'), { ssr: false });
 import { twMerge } from 'tailwind-merge';
 import classNames from 'classnames';
+import { useMemo, useState } from 'react';
+import { useFormStateCtx } from '@/components/units/ServerActionForm';
 
-type Option = {
-  label: string;
-  value: string;
-};
+export type Option = { label: string; value: string };
 
-interface SelectInputProps {
+type Props = {
   name: string;
   label?: string;
   options: Option[];
   className?: string;
   isClearable?: boolean;
   placeholder?: string;
-}
+};
 
-export default function SelectInput({
+export default function Select({
   name,
   label,
   options,
   className,
   isClearable = false,
   placeholder,
-}: SelectInputProps) {
-  const {
-    control,
-    formState: { errors },
-  } = useFormContext();
+}: Props) {
+  const { errors, values } = useFormStateCtx();
+  const error = errors?.[name];
+
+  const initial = useMemo(
+    () => options.find((o) => o.value === values?.[name]) ?? null,
+    [options, values?.[name]]
+  );
+  const [value, setValue] = useState<Option | null>(initial);
 
   return (
-    <div className="flex flex-col gap-2 items-start w-full">
+    <div
+      suppressHydrationWarning
+      className="flex flex-col gap-2 items-start w-full"
+    >
       {label && (
-        <label htmlFor={name} className="text-sm font-medium">
+        <label htmlFor={`select-input-${name}`} className="text-sm font-medium">
           {label}
         </label>
       )}
 
-      <Controller
-        name={name}
-        control={control}
-        render={({ field }) => {
-          const selectedValue = options.find(
-            (opt) => opt.value === field.value
-          );
+      <input type="hidden" name={name} value={value?.value ?? ''} />
 
-          const handleChange = (option: Option | null) => {
-            field.onChange(option?.value ?? '');
-          };
-
-          return (
-            <Select
-              inputId={name}
-              options={options}
-              value={selectedValue}
-              onChange={handleChange}
-              isClearable={isClearable}
-              placeholder={placeholder || `Select ${label || name}`}
-              className={twMerge(classNames('w-full', className))}
-              classNamePrefix="react-select"
-              styles={{
-                control: (base) => ({
-                  ...base,
-                  width: '100%',
-                  minHeight: '40px',
-                  borderColor: '#d1d5db',
-                  boxShadow: 'none',
-                  '&:hover': {
-                    borderColor: '#d1d5db',
-                  },
-                  borderRadius: '0.375rem',
-                  paddingLeft: '0.5rem',
-                }),
-                valueContainer: (base) => ({
-                  ...base,
-                  paddingLeft: 0,
-                }),
-                placeholder: (base) => ({
-                  ...base,
-                  textAlign: 'left',
-                }),
-                singleValue: (base) => ({
-                  ...base,
-                  textAlign: 'left',
-                }),
-                menu: (base) => ({
-                  ...base,
-                  textAlign: 'left',
-                }),
-                option: (base, state) => ({
-                  ...base,
-                  textAlign: 'left',
-                  backgroundColor: state.isFocused ? '#f3f4f6' : 'white',
-                  color: '#111827',
-                  cursor: 'pointer',
-                }),
-              }}
-              theme={(theme) => ({
-                ...theme,
-                colors: {
-                  ...theme.colors,
-                  primary25: '#f3f4f6',
-                  primary: '#d1d5db',
-                },
-              })}
-            />
-          );
+      <ReactSelect
+        instanceId={`select-${name}`}
+        inputId={`select-input-${name}`}
+        options={options}
+        value={value}
+        defaultMenuIsOpen={false}
+        onChange={(opt) => setValue((opt as Option) ?? null)}
+        isClearable={isClearable}
+        placeholder={placeholder || `Select ${label || name}`}
+        className={twMerge(classNames('w-full', className))}
+        classNamePrefix="react-select"
+        styles={{
+          control: (base) => ({
+            ...base,
+            width: '100%',
+            minHeight: '40px',
+            borderColor: error ? '#ef4444' : '#d1d5db',
+            boxShadow: 'none',
+            '&:hover': { borderColor: error ? '#ef4444' : '#d1d5db' },
+            borderRadius: '0.375rem',
+            paddingLeft: '0.5rem',
+          }),
         }}
+        theme={(theme) => ({
+          ...theme,
+          colors: { ...theme.colors, primary25: '#f3f4f6', primary: '#d1d5db' },
+        })}
       />
 
-      {errors[name] && (
-        <span className="text-red-500 text-sm">
-          {(errors[name]?.message as string) || 'Invalid input'}
-        </span>
-      )}
+      {error && <span className="text-red-500 text-sm">{error}</span>}
     </div>
   );
 }

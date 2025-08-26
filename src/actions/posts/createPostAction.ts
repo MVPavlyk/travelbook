@@ -4,55 +4,61 @@ import { prismaClient } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { uploadImageAction } from '@/actions/images/uploadImageAction';
 import { getSessionAction } from '@/actions/user/getSessionAction';
+import { redirect } from 'next/navigation';
 
-export async function createPostAction(formData: FormData) {
+import { createPostSchema } from '@/lib/validation/posts';
+import { zodToErrors } from '@/lib/validation/utils';
+import { validateImages } from '@/lib/validation/files';
+import { STATIC_ROUTES } from '@/lib/constants/staticRoutes';
+import { FormState } from '@/lib/types/form';
+
+export async function createPostAction(
+  _prev: FormState,
+  formData: FormData
+): Promise<FormState> {
   const session = await getSessionAction();
-  if (!session) throw new Error('Unauthorized');
+  if (!session) return { serverError: 'Unauthorized', values: {} };
 
-  const title = formData.get('title') as string;
-  const country = formData.get('country') as string;
-  const duration = formData.get('duration') as string;
-  const impression = formData.get('impression') as string;
-  const approximateCost = formData.get('approximateCost') as string;
-  const description = formData.get('description') as string;
+  const rawValues = {
+    title: String(formData.get('title') ?? ''),
+    country: String(formData.get('country') ?? ''),
+    duration: String(formData.get('duration') ?? ''),
+    impression: String(formData.get('impression') ?? ''),
+    approximateCost: String(formData.get('approximateCost') ?? ''),
+    description: String(formData.get('description') ?? ''),
+  };
 
-  const files = formData.getAll('images') as File[];
-
-  if (
-    !title ||
-    !country ||
-    !duration ||
-    !impression ||
-    !approximateCost ||
-    !description
-  ) {
-    throw new Error('All fields are required');
+  const parsed = createPostSchema.safeParse(rawValues);
+  if (!parsed.success) {
+    return { errors: zodToErrors(parsed.error), values: rawValues };
   }
 
-  const uploadPromises = files.map(async (file) => {
-    return await uploadImageAction(file);
-  });
+  const files = formData.getAll('images') as File[];
+  const imageError = validateImages(files);
+  if (imageError) {
+    return { errors: { images: imageError }, values: rawValues };
+  }
 
-  const results = await Promise.all(uploadPromises);
+  const uploadedUrls = (
+    await Promise.all(files.map((file) => uploadImageAction(file)))
+  ).filter((url): url is string => !!url);
 
-  const uploadedUrls: string[] = results.filter((url): url is string => !!url);
+  const parsedData = parsed.data;
 
-  const newPost = await prismaClient.post.create({
+  await prismaClient.post.create({
     data: {
-      title,
-      country,
-      duration,
-      impression: Number(impression),
-      approximateCost: Number(approximateCost),
-      description,
+      title: parsedData.title,
+      country: parsedData.country,
+      duration: parsedData.duration,
+      impression: parsedData.impression,
+      approximateCost: parsedData.approximateCost,
+      description: parsedData.description,
       userId: session.user.id,
-      images: {
-        create: uploadedUrls.map((url) => ({ url })),
-      },
+      images: { create: uploadedUrls.map((url) => ({ url })) },
     },
     include: { images: true },
   });
 
-  revalidatePath('/');
-  return { message: 'Post created', post: newPost };
+  revalidatePath(STATIC_ROUTES.HOME);
+  redirect(STATIC_ROUTES.HOME);
 }
