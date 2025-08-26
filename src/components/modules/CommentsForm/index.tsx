@@ -1,7 +1,7 @@
 import ServerActionForm from '@/components/units/ServerActionForm';
 import SubmitButton from '@/components/units/ServerActionForm/SubmitButton';
-import Textarea from '@/components/units/ServerActionForm/Textarea';
-import ImageUploader from '@/components/units/ServerActionForm/ImageUploader';
+import Textarea from '@/components/elements/Textarea';
+import ImageUploader from '../../units/ImageUploader';
 import { createCommentAction } from '@/actions/comments/createCommentAction';
 
 export default function CreateCommentForm({

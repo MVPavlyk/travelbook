@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { STATIC_ROUTES } from '@/lib/constants/staticRoutes';
 import { signUpAction } from '@/actions/user/signUpAction';
 import SubmitButton from '@/components/units/ServerActionForm/SubmitButton';
-import Input from '@/components/units/ServerActionForm/Input';
+import Input from '@/components/elements/Input';
 
 export default function RegistrationForm() {
   return (

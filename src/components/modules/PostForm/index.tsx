@@ -1,12 +1,10 @@
 import { createPostAction } from '@/actions/posts/createPostAction';
 import { TCountry } from '@/lib/types/county';
-import SelectInput, {
-  Option,
-} from '@/components/units/ServerActionForm/SelectInput';
+import Select, { Option } from '@/components/elements/Select';
 import ServerActionForm from '@/components/units/ServerActionForm';
-import Input from '@/components/units/ServerActionForm/Input';
-import Textarea from '@/components/units/ServerActionForm/Textarea';
-import ImageUploader from '@/components/units/ServerActionForm/ImageUploader';
+import Input from '@/components/elements/Input';
+import Textarea from '@/components/elements/Textarea';
+import ImageUploader from '../../units/ImageUploader';
 import SubmitButton from '@/components/units/ServerActionForm/SubmitButton';
 
 export default function CreatePostForm({
@@ -34,7 +32,7 @@ export default function CreatePostForm({
           required
           placeholder="Enter post title"
         />
-        <SelectInput
+        <Select
           name="country"
           label="Country"
           options={options}

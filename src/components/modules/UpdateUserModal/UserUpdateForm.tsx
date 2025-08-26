@@ -1,8 +1,8 @@
 import ServerActionForm from '@/components/units/ServerActionForm';
 import { updateUserAction } from '@/actions/user/updateUserAction';
 import type { User } from '@prisma/client';
-import Input from '@/components/units/ServerActionForm/Input';
-import ImageUploader from '@/components/units/ServerActionForm/ImageUploader';
+import Input from '@/components/elements/Input';
+import ImageUploader from '../../units/ImageUploader';
 import SubmitButton from '@/components/units/ServerActionForm/SubmitButton';
 import DispatchOkEvent from '@/components/units/ServerActionForm/DispatchOkEvent';
 
