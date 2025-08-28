@@ -1,7 +1,6 @@
 'use server';
 
 import { prismaClient } from '@/lib/prisma';
-import { revalidatePath } from 'next/cache';
 import { getSessionAction } from '@/actions/user/getSessionAction';
 import { uploadImageAction } from '@/actions/images/uploadImageAction';
 
@@ -12,6 +11,7 @@ import {
 import { zodToErrors } from '@/lib/validation/utils';
 import { FormState } from '@/lib/types/form';
 import { validateImages } from '@/lib/validation/files';
+import { revalidatePath } from 'next/cache';
 
 export async function createCommentAction(
   _prev: FormState,

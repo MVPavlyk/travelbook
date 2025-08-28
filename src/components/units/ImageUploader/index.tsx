@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
-import { useId } from 'react';
+import React, { useEffect, useRef, useState, useId } from 'react';
 import { useFormStateCtx } from '@/components/units/ServerActionForm';
 
 type ImageWithPreview = { file: File; preview: string };
@@ -22,7 +21,6 @@ export default function ImageUploader({
   const id = useId();
   const [images, setImages] = useState<ImageWithPreview[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
-
   const { errors, ok } = useFormStateCtx();
   const error = errors?.[name];
 
@@ -43,10 +41,18 @@ export default function ImageUploader({
     syncToInput(next.map((i) => i.file));
   };
 
-  const removeImage = (idx: number) => {
-    const next = images.filter((_, i) => i !== idx);
-    setImages(next);
-    syncToInput(next.map((i) => i.file));
+  const clearAll = () => {
+    setImages((prev) => {
+      prev.forEach((i) => URL.revokeObjectURL(i.preview));
+      return [];
+    });
+    if (inputRef.current) {
+      inputRef.current.value = '';
+      try {
+        const dt = new DataTransfer();
+        inputRef.current.files = dt.files;
+      } catch {}
+    }
   };
 
   useEffect(() => {
@@ -54,14 +60,15 @@ export default function ImageUploader({
   }, [images]);
 
   useEffect(() => {
-    if (!ok) return;
-    setImages((prev) => {
-      prev.forEach((i) => URL.revokeObjectURL(i.preview));
-      return [];
-    });
-    if (inputRef.current) {
-      inputRef.current.value = '';
-    }
+    const form = inputRef.current?.closest('form');
+    if (!form) return;
+    const onReset = () => clearAll();
+    form.addEventListener('reset', onReset);
+    return () => form.removeEventListener('reset', onReset);
+  }, []);
+
+  useEffect(() => {
+    if (ok) clearAll();
   }, [ok]);
 
   return (
@@ -102,7 +109,12 @@ export default function ImageUploader({
             />
             <button
               type="button"
-              onClick={() => removeImage(index)}
+              onClick={() => {
+                const next = images.filter((_, i) => i !== index);
+                setImages(next);
+                syncToInput(next.map((i) => i.file));
+                URL.revokeObjectURL(img.preview);
+              }}
               className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 text-xs"
               aria-label="Remove image"
             >

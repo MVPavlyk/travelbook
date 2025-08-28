@@ -1,8 +1,10 @@
 import ServerActionForm from '@/components/units/ServerActionForm';
 import SubmitButton from '@/components/units/ServerActionForm/SubmitButton';
-import Textarea from '@/components/elements/Textarea';
-import ImageUploader from '../../units/ImageUploader';
+import DispatchOkEvent from '@/components/units/ServerActionForm/DispatchOkEvent';
 import { createCommentAction } from '@/actions/comments/createCommentAction';
+import OptimisticOnSubmit from './OptimisticOnSubmit';
+import ImageUploader from '@/components/units/ImageUploader';
+import Textarea from '@/components/elements/Textarea';
 
 export default function CreateCommentForm({
   postId,
@@ -20,7 +22,6 @@ export default function CreateCommentForm({
         className="space-y-4 w-full max-w-[768px]"
       >
         <input type="hidden" name="postId" value={postId} />
-
         <Textarea
           name="text"
           label="Comment"
@@ -31,6 +32,9 @@ export default function CreateCommentForm({
         <ImageUploader name="images" multiple max={10} />
 
         <SubmitButton>Comment</SubmitButton>
+
+        <OptimisticOnSubmit />
+        <DispatchOkEvent eventName="comment:created" />
       </ServerActionForm>
     </div>
   );
