@@ -93,7 +93,7 @@ const Page = async ({ params }: { params: TParams }) => {
         </p>
       </div>
       <div className="w-full flex flex-col pb-16 gap-y-10 items-center j">
-        <CreateCommentForm postId={postId} />
+        {session && <CreateCommentForm postId={postId} />}
         <PostCommentsSection postId={postId} />
       </div>
     </MainLayout>

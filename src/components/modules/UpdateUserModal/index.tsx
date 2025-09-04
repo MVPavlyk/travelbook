@@ -6,16 +6,14 @@ import { useRouter } from 'next/navigation';
 import type { User } from '@prisma/client';
 import Modal from '@/components/elements/Modal';
 import UserUpdateForm from '@/components/modules/UpdateUserModal/UserUpdateForm';
+import { UI_EVENTS } from '@/lib/constants/uiEvents';
 
 type Props = {
   user: User;
   eventName?: string;
 };
 
-export default function UserUpdateModal({
-  user,
-  eventName = 'user-updated',
-}: Props) {
+export default function UserUpdateModal({ user }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
 
@@ -24,10 +22,13 @@ export default function UserUpdateModal({
       setIsOpen(false);
       router.refresh();
     };
-    window.addEventListener(eventName, handler as EventListener);
+    window.addEventListener(UI_EVENTS.user.updated, handler as EventListener);
     return () =>
-      window.removeEventListener(eventName, handler as EventListener);
-  }, [eventName, router]);
+      window.removeEventListener(
+        UI_EVENTS.user.updated,
+        handler as EventListener
+      );
+  }, [router]);
 
   return (
     <>

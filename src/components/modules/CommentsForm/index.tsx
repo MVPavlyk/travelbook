@@ -1,8 +1,12 @@
 import ServerActionForm from '@/components/units/ServerActionForm';
 import SubmitButton from '@/components/units/ServerActionForm/SubmitButton';
-import Textarea from '@/components/elements/Textarea';
-import ImageUploader from '../../units/ImageUploader';
+import DispatchOkEvent from '@/components/units/ServerActionForm/DispatchOkEvent';
+import DispatchErrorEvent from '@/components/units/ServerActionForm/DispatchErrorEvent';
 import { createCommentAction } from '@/actions/comments/createCommentAction';
+import OptimisticOnSubmit from './OptimisticOnSubmit';
+import ImageUploader from '@/components/units/ImageUploader';
+import Textarea from '@/components/elements/Textarea';
+import { UI_EVENTS } from '@/lib/constants/uiEvents';
 
 export default function CreateCommentForm({
   postId,
@@ -31,6 +35,10 @@ export default function CreateCommentForm({
         <ImageUploader name="images" multiple max={10} />
 
         <SubmitButton>Comment</SubmitButton>
+
+        <OptimisticOnSubmit />
+        <DispatchOkEvent eventName={UI_EVENTS.comment.created} />
+        <DispatchErrorEvent eventName={UI_EVENTS.comment.failed} />
       </ServerActionForm>
     </div>
   );

@@ -5,6 +5,7 @@ import Input from '@/components/elements/Input';
 import ImageUploader from '../../units/ImageUploader';
 import SubmitButton from '@/components/units/ServerActionForm/SubmitButton';
 import DispatchOkEvent from '@/components/units/ServerActionForm/DispatchOkEvent';
+import { UI_EVENTS } from '@/lib/constants/uiEvents';
 
 export default function UserUpdateForm({ user }: { user: User }) {
   return (
@@ -31,7 +32,7 @@ export default function UserUpdateForm({ user }: { user: User }) {
         <ImageUploader name="avatar" max={1} />
       </div>
       <SubmitButton>Save</SubmitButton>
-      <DispatchOkEvent eventName="user-updated" />
+      <DispatchOkEvent eventName={UI_EVENTS.user.updated} />
     </ServerActionForm>
   );
 }
