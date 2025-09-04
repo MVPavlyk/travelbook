@@ -77,7 +77,7 @@ export default function Input({
         onInvalid={(e) => {
           const target = e.target as HTMLInputElement;
           if (!target.validity.valid && !error)
-            target.setCustomValidity('Будь ласка, заповніть це поле коректно.');
+            target.setCustomValidity('Something is wrong');
         }}
         onChange={(e) => {
           (e.target as HTMLInputElement).setCustomValidity('');
