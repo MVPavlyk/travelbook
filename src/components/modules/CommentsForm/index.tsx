@@ -1,10 +1,12 @@
 import ServerActionForm from '@/components/units/ServerActionForm';
 import SubmitButton from '@/components/units/ServerActionForm/SubmitButton';
 import DispatchOkEvent from '@/components/units/ServerActionForm/DispatchOkEvent';
+import DispatchErrorEvent from '@/components/units/ServerActionForm/DispatchErrorEvent';
 import { createCommentAction } from '@/actions/comments/createCommentAction';
 import OptimisticOnSubmit from './OptimisticOnSubmit';
 import ImageUploader from '@/components/units/ImageUploader';
 import Textarea from '@/components/elements/Textarea';
+import { UI_EVENTS } from '@/lib/constants/uiEvents';
 
 export default function CreateCommentForm({
   postId,
@@ -22,6 +24,7 @@ export default function CreateCommentForm({
         className="space-y-4 w-full max-w-[768px]"
       >
         <input type="hidden" name="postId" value={postId} />
+
         <Textarea
           name="text"
           label="Comment"
@@ -34,7 +37,8 @@ export default function CreateCommentForm({
         <SubmitButton>Comment</SubmitButton>
 
         <OptimisticOnSubmit />
-        <DispatchOkEvent eventName="comment:created" />
+        <DispatchOkEvent eventName={UI_EVENTS.comment.created} />
+        <DispatchErrorEvent eventName={UI_EVENTS.comment.failed} />
       </ServerActionForm>
     </div>
   );

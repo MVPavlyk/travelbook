@@ -1,6 +1,7 @@
 import { getPostCommentsAction } from '@/actions/comments/getPostCommentsAction';
 import { getSessionAction } from '@/actions/user/getSessionAction';
-import OptimisticComments, { CommentWithRelations } from './OptimisticComments';
+import OptimisticComments from './OptimisticComments';
+import { CommentWithRelations } from '@/lib/types/comments';
 
 export default async function PostCommentsSection({
   postId,
